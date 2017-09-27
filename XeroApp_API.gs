@@ -3,13 +3,15 @@
 // JSHint - TODO
 /* jshint asi: true */
 
-// XeroApp.gs
-// ==========
+// XeroApp_API.gs
+// ==============
 //
 // External interface to this script - all of the event handlers.
 //
 // This files contains all of the event handlers, plus miscellaneous functions 
 // not worthy of their own files yet
+
+var ActiveSpreadsheetId_ = null
 
 // Public event handlers
 // ---------------------
@@ -33,6 +35,7 @@ var EVENT_HANDLERS = {
 //                         Initial actions  Name                         onError Message                           Main Functionality
 //                         ---------------  ----                         ---------------                           ------------------
 
+  getMenu:                 [function() {},  'getMenu()',                'Failed to initialise XeroApp',            getMenu_],  
   doGet:                   [function() {},  'doGet()',                  'Failed to process GET',                   doGet_],
   serverStoreHierachy:     [function() {},  'serverStoreHierachy()',    'Failed to store hierachy',                serverStoreHierachy_],
   closeConnection:         [function() {},  'closeConnection()',        'Failed to close connection',              closeConnection_],
@@ -44,11 +47,9 @@ var EVENT_HANDLERS = {
   invoicesDownload:        [function() {},  'invoicesDownload()',       'Failed to handle invoices download',      invoicesDownload_],    
   trialBalancesDownloadReport: [function() {}, 'trialBalancesDownloadReport()', 'Failed to handle trials download (reporting)', trialBalancesDownloadReport_],    
   trialBalancesDownloadRange:  [function() {}, 'trialBalancesDownloadRange()',  'Failed to handle trials download (range)',     trialBalancesDownloadRange_],    
-  
 }
 
-// function (arg)                     {return eventHandler_(EVENT_HANDLERS., arg)}
-
+function getMenu(arg)                     {return eventHandler_(EVENT_HANDLERS.getMenu, arg)}
 function doGet(arg)                       {return eventHandler_(EVENT_HANDLERS.doGet, arg)}
 function serverStoreHierachy(arg)         {return eventHandler_(EVENT_HANDLERS.serverStoreHierachy, arg)}
 function closeConnection(arg)             {return eventHandler_(EVENT_HANDLERS.closeConnection, arg)}
@@ -61,41 +62,6 @@ function invoicesDownload(arg)            {return eventHandler_(EVENT_HANDLERS.i
 function trialBalancesDownloadReport(arg) {return eventHandler_(EVENT_HANDLERS.trialBalancesDownloadReport, arg)}
 function trialBalancesDownloadRange(arg)  {return eventHandler_(EVENT_HANDLERS.trialBalancesDownloadRange, arg)}
 
-/**
- * 'on open' event handler. This is a special case as it has limited 
- * authorisation when the doc opens
- */
-
-function onOpen() {
-
-  var value = PropertiesService.getScriptProperties().getProperty('isConnected')
-  var isConnected = (value === 'true') ? true : false
-  
-  var ui = SpreadsheetApp.getUi()
-  
-  if (ui === null) {
-    Log.warning('onOpen called out of context of UI')
-    return
-  }
-  
-  var menu = ui.createMenu('Xero')
-    
-  if (isConnected) {
-  
-    menu.addItem('Download trial balances (use Reporting Date)', 'trialBalancesDownloadReport')    
-    menu.addItem('Download trial balances (use Date Range)', 'trialBalancesDownloadRange')        
-    menu.addItem('Download invoices', 'invoicesDownload')
-    menu.addItem('Disconnect', 'closeConnection')
-    
-  } else {
-    
-    menu.addItem('Settings (connect) ...', 'displayXeroSetup')
-  }
-     
-  menu.addToUi()
-
-} // onOpen_()
-
 // Private Functions
 // =================
 
@@ -107,6 +73,10 @@ function trialBalancesDownloadRange_(arg)  {return TrialBalance_.download(false)
 
 // General
 // -------
+
+function init(activeSpreadsheetId) {
+  ActiveSpreadsheetId_ = activeSpreadsheetId  
+} // init()
 
 /**
  * All external function calls should call this to ensure standard 
@@ -122,13 +92,6 @@ function trialBalancesDownloadRange_(arg)  {return TrialBalance_.download(false)
 
 function eventHandler_(config, arg) {
 
-  // By default, only one instance of this script can run at a time
-  var lock = LockService.getScriptLock()
-  
-  if (!lock.tryLock(1000)) {  
-    return
-  }
-  
   try {
 
     config[0]()
@@ -148,6 +111,8 @@ function eventHandler_(config, arg) {
       scriptVersion: SCRIPT_VERSION, 
     })
     
+    Log.fine('arg: ' + JSON.stringify(arg))
+    
     return config[3](arg)
     
   } catch (error) {
@@ -156,11 +121,7 @@ function eventHandler_(config, arg) {
     
     CBL.endContinuousExecutionInstance( 
       ADMIN_EMAIL_ADDRESS, 
-      CBL_ERROR_EMAIL_TITLE) 
-        
-  } finally {
-  
-    lock.releaseLock()
+      CBL_ERROR_EMAIL_TITLE)      
   }
   
 } // eventHandler_()
@@ -174,8 +135,18 @@ function eventHandler_(config, arg) {
 
 function doGet_(e) {
 
-  return (e.queryString === 'sort') ? sortAccounts() : completeAuth();
+  Log.functionEntryPoint('doGet: ' + JSON.stringify(e))
   
+  if (typeof e !== 'undefined') {
+    if (e.hasOwnProperty('queryString')) {
+      if (e.queryString === 'sort') {      
+        return sortAccounts()
+      }
+    }
+  }
+  
+  return completeAuth()
+    
   // Private Functions
   // -----------------
 
@@ -190,7 +161,7 @@ function doGet_(e) {
     var accountNames = Accounts_.download();  
     var template = HtmlService.createTemplateFromFile('Index');  
     var itemList = '';
-    var itemId = 1
+    var itemId = 1;
   
     accountNames.forEach(function(accountName) {
     
@@ -218,17 +189,15 @@ function doGet_(e) {
     
     // Exchange verified Request token for Access Token
     
-    XeroApi_.loadSettings();
+    Api_.loadSettings();
 
-    var properties = PropertiesService.getScriptProperties();
-    
-    Log.fine('doGet: XeroApi_.getProperty[consumerKey]' + XeroApi_.getProperty('consumerKey'));
+    var properties = PropertiesService.getUserProperties();
     
     var payload = {
-      "oauth_consumer_key": XeroApi_.getProperty('consumerKey'),
+      "oauth_consumer_key": Api_.getProperty('consumerKey'),
       "oauth_token": e.parameter.oauth_token,
       "oauth_signature_method": "PLAINTEXT",
-      "oauth_signature": encodeURIComponent(XeroApi_.getProperty('consumerSecret') + '&' + XeroApi_.getProperty('requestTokenSecret')),
+      "oauth_signature": encodeURIComponent(Api_.getProperty('consumerSecret') + '&' + Api_.getProperty('requestTokenSecret')),
       "oauth_timestamp": ((new Date().getTime())/1000).toFixed(0),
       "oauth_nonce": Utils_.generateRandomString(Math.floor(Math.round(25))),
       "oauth_version": "1.0",
@@ -275,7 +244,7 @@ function serverStoreHierachy_(formObject) {
 
   Log.functionEntryPoint()
 
-  var ss = SpreadsheetApp.openById(XEROAPP_SHEET_ID);  
+  var ss = SpreadsheetApp.openById(ActiveSpreadsheetId_);  
   var sheet = ss.getSheetByName(ACCOUNTS_HIERARCHY_SHEET_NAME);
   
   if (sheet === null) {
@@ -322,6 +291,26 @@ function serverStoreHierachy_(formObject) {
 
 function closeConnection_() {
   Log.functionEntryPoint()
-  PropertiesService.getScriptProperties().setProperty('isConnected', 'false'); 
-  onOpen()
+  PropertiesService.getUserProperties().setProperty('isConnected', 'false'); 
 }
+
+function getMenu_(ui) {
+
+  var isConnected = Utils_.isConnected()   
+  var menu = ui.createMenu('Xero')
+    
+  if (isConnected) {
+  
+    menu.addItem('Download trial balances (use Reporting Date)', 'trialBalancesDownloadReport')    
+    menu.addItem('Download trial balances (use Date Range)', 'trialBalancesDownloadRange')        
+    menu.addItem('Download invoices', 'invoicesDownload')
+    menu.addItem('Disconnect', 'closeConnection')
+    
+  } else {
+    
+    menu.addItem('Settings (connect) ...', 'displayXeroSetup')
+  }
+  
+  return menu
+  
+} // getMenu_()

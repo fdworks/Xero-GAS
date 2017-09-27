@@ -8,7 +8,7 @@
 //
 // Object for connecting to the Xero API
 
-var XeroApi_ = {  
+var Api_ = {  
 
   // Local setting storage 
   appType: '', 
@@ -42,7 +42,9 @@ var XeroApi_ = {
   
     Log.functionEntryPoint();  
     
-    var p = PropertiesService.getScriptProperties().getProperties();   
+    var p = PropertiesService.getUserProperties().getProperties();
+    
+    Log.finest('loadSettings: ' + JSON.stringify(p))
     
     if (p.appType === null || p.appType === '') {
     
@@ -136,7 +138,7 @@ var XeroApi_ = {
       var secretMatch = reTokenSecret.exec(response.getContentText())  ;
       var tokenSecret = secretMatch[2];
       
-      PropertiesService.getScriptProperties().setProperty('requestTokenSecret', tokenSecret); 
+      PropertiesService.getUserProperties().setProperty('requestTokenSecret', tokenSecret); 
       
       //Log.fine('Request Token = ' + oAuthRequestToken);
       //Log.fine('Request Token Secret = ' + tokenSecret);
@@ -152,7 +154,7 @@ var XeroApi_ = {
     
     return authUrl
     
-  }, // XeroApi_.connect()
+  }, // Api_.connect()
   
   /**
    * Fetch private app data
@@ -344,7 +346,7 @@ var XeroApi_ = {
       
     } else if (responseCode === 401) {
     
-      PropertiesService.getScriptProperties().setProperty('isConnected', 'false')
+      PropertiesService.getUserProperties().setProperty('isConnected', 'false')
       onOpen() // Reset menu
       throw new Error('The Auth token has expired, run Xero > Settings (connect)');
       

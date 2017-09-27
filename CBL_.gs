@@ -50,7 +50,7 @@ startOrResumeContinousExecutionInstance: function(fname) {
 
   fname = Utils_.getDefault(fname, CBL_BATCH_FUNCTION_NAME)
 
-  var properties = PropertiesService.getScriptProperties()
+  var properties = PropertiesService.getUserProperties()
   var start = properties.getProperty(CBL_PREFIX + fname + CBL_START_BATCH_POSTFIX)
   
   if (start === '' || start === null)
@@ -86,7 +86,7 @@ setBatchKey: function (key, fname){
   
   checkInitialised()
     
-  var properties = PropertiesService.getScriptProperties()
+  var properties = PropertiesService.getUserProperties()
   properties.setProperty(CBL_PREFIX + fname + CBL_KEY_POSTFIX, key)
   
 }, // CBL.setBatchKey()
@@ -108,7 +108,7 @@ getBatchKey: function(fname) {
     
   checkInitialised()  
   
-  var properties = PropertiesService.getScriptProperties()
+  var properties = PropertiesService.getUserProperties()
   return properties.getProperty(CBL_PREFIX + fname + CBL_KEY_POSTFIX)
   
 }, // CBL.getBatchKey()
@@ -135,7 +135,7 @@ endContinuousExecutionInstance: function(emailRecipient, customTitle, fname) {
 
   checkInitialised()
   
-  var properties = PropertiesService.getScriptProperties()
+  var properties = PropertiesService.getUserProperties()
   var end = new Date()
   var start = properties.getProperty(CBL_PREFIX + fname + CBL_START_BATCH_POSTFIX)
   var key = properties.getProperty(CBL_PREFIX + fname + CBL_KEY_POSTFIX)
@@ -210,8 +210,7 @@ function enableNextTrigger_(fname) {
   
   var triggerId = nextTrigger.getUniqueId();
  
-  PropertiesService
-    .getScriptProperties()
+  PropertiesService.getUserProperties()
     .setProperty(CBL_PREFIX + fname + CBL_TRIGGER_ID_POSTFIX, triggerId);
   
 } // CBL.enableNextTrigger_()
@@ -227,7 +226,7 @@ function deleteCurrentTrigger_(fname) {
 
   Log.functionEntryPoint()
 
-  var properties = PropertiesService.getScriptProperties();
+  var properties = PropertiesService.getUserProperties();
   var triggerId = properties.getProperty(CBL_PREFIX + fname + CBL_TRIGGER_ID_POSTFIX);
   var triggers = ScriptApp.getProjectTriggers();
   

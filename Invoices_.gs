@@ -32,7 +32,7 @@ download: function() {
   // Get the Invoices
   // ----------------
   
-  var responseData = XeroApi_.fetchData('Invoices')
+  var responseData = Api_.fetchData('Invoices')
     
   if (responseData === null) {
     throw new Error('Could not get Invoice data')
@@ -45,7 +45,7 @@ download: function() {
   // Get the CreditNotes
   // -------------------
 
-  var responseData = XeroApi_.fetchData('CreditNotes')
+  var responseData = Api_.fetchData('CreditNotes')
     
   if (responseData === null) {
     throw new Error('Could not get CreditNote data')
@@ -382,13 +382,13 @@ fullDownload: function() {
   var pageNo = 1
   var moreData = true
   
-  XeroApi_.connect()
+  Api_.connect()
   
   while (moreData) {
   
     spreadsheet.toast('Downloading page ' + pageNo + ' ...')
     
-    var responseData = XeroApi_.fetchData(INVOICE_URL, pageNo)
+    var responseData = Api_.fetchData(INVOICE_URL, pageNo)
     var invoices    
     
     if (responseData !== null) {

@@ -30,7 +30,7 @@ function displayXeroSetup_() {
   var ss = SpreadsheetApp.getActiveSpreadsheet();    
   var app = UiApp.createApplication();
   app.setHeight(400);
-  var scriptProps = PropertiesService.getScriptProperties(); 
+  var scriptProps = PropertiesService.getUserProperties(); 
   
   var label1 = app.createLabel('XERO Settings').setStyleAttribute('font-weight', 'bold').setStyleAttribute('padding', '5px').setId('label1');        
   var panel1 = app.createVerticalPanel().setId('panel1');
@@ -106,14 +106,16 @@ function displayXeroSetup_() {
 function saveSettings_(e) {
 
   Log.functionEntryPoint();
+  
+  Log.fine(JSON.stringify(e))
 
   var ss = SpreadsheetApp.getActiveSpreadsheet();  
   
   //var app = UiApp.getActiveApplication();
   var app = UiApp.getActiveApplication();
   
-  // we have the settings in e.parameter  
-  var sProps = PropertiesService.getScriptProperties();    
+  // we have the settings in e.parameter
+  var sProps = PropertiesService.getUserProperties();    
   var p = e.parameter;
   
   var properties = {
@@ -140,7 +142,7 @@ function saveSettings_(e) {
     app.remove(app.getElementById('panel1'));          
     app.setHeight(50);app.setWidth(100);
     
-    var result = XeroApi_.connect();
+    var result = Api_.connect();
     Log.fine('Connect result: ' + result);
     
     if (result !== '') {
@@ -252,12 +254,12 @@ function handleInvoicesDownload(){
   
   try {
     // Connect to Xero
-    XeroApi_.connect();   
+    Api_.connect();   
     
     while (moreData) {
       ss.toast('Downloading page ' + pageNo + ' ...');
       // API call          
-      var invoice_info = XeroApi_.fetchData('Invoices', pageNo);
+      var invoice_info = Api_.fetchData('Invoices', pageNo);
       Log.fine(invoice_info);
       
       if (invoice_info) var invoices = invoice_info.Invoices; 
@@ -347,12 +349,12 @@ function handlePaymentsDownload(){
   
   try {
     // Connect to Xero
-    XeroApi_.connect();
+    Api_.connect();
     
     ss.toast("Downloading page " + pageNo + "...");
     while (moreData) {
       // API call
-      var payments_info = XeroApi_.fetchData('Payments', pageNo); // Data should retrieve in JSON format
+      var payments_info = Api_.fetchData('Payments', pageNo); // Data should retrieve in JSON format
       
       if (payments_info) var payments = payments_info.Payments;  
       else return app;    
@@ -536,8 +538,8 @@ function uploadInvoices(){
   payload  += "</Invoices>";
   
   try {    
-    XeroApi_.connect();
-    var response = XeroApi_.uploadData('Invoices', payload);
+    Api_.connect();
+    var response = Api_.uploadData('Invoices', payload);
     if (response) {
       // request successful, Log failed invoices
       var invoices = response.Invoices;    
@@ -696,9 +698,9 @@ function uploadPayments() {
   payload  += "</Payments>";
   
   try {    
-    XeroApi_.connect();
+    Api_.connect();
     var method = 'PUT';
-    var response = XeroApi_.uploadData('Payments', payload, method);
+    var response = Api_.uploadData('Payments', payload, method);
     if (response.code != 200) {
       // Log failed items if any                      
       if (response.code == 400)  {

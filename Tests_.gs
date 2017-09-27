@@ -56,7 +56,7 @@ function test_doServerSomething() {
 }
 
 function test_dumpConfig() {
-  Logger.log(PropertiesService.getScriptProperties().getProperties())
+  Logger.log(PropertiesService.getUserProperties().getProperties())
 }
 
 function test_clearConfig() {

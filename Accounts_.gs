@@ -42,7 +42,7 @@ download: function() {
   var moreData = true
 
   // Connect to Xero
-  XeroApi_.connect()   
+  Api_.connect()   
   
   while (moreData) {
   
@@ -52,7 +52,7 @@ download: function() {
       ss.toast('Downloading page ' + pageNo + ' ...')
     }
     
-    var accountsInfo = XeroApi_.fetchData('Accounts', pageNo)
+    var accountsInfo = Api_.fetchData('Accounts', pageNo)
     
     if (accountsInfo !== null) {
       accounts = accountsInfo.Accounts

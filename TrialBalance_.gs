@@ -110,7 +110,7 @@ download: function(useReportingDate) {
   
   function getTrialBalance(reportingDateString) {
   
-    var responseData = XeroApi_.fetchData(TRIAL_BALANCE_URL, reportingDateString, 'date')
+    var responseData = Api_.fetchData(TRIAL_BALANCE_URL, reportingDateString, 'date')
   
     if (responseData === null) {
       throw new Error('Could not get Trial Balances data')

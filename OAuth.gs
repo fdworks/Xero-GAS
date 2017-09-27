@@ -8,9 +8,6 @@
 //
 // Connect to the Xero API using the Google OAuth library
 
-var CONSUMER_KEY = 'AJRKCDHMKUFHN1KAPGIVFRQZ6XXX2L';
-var CONSUMER_SECRET = 'YWJOI3LGLATGI05GF6HVLLOZKRLY7L';
-
 /**
  * Authorizes and makes a request to the Xero API.
  */
@@ -51,21 +48,22 @@ function reset() {
 function getService() {
 
   return OAuth1.createService('Xero')
-      // Set the endpoint URLs.
-      .setRequestTokenUrl(REQUEST_TOKEN_URL)
-      .setAuthorizationUrl(AUTHORIZE_URL)
-      .setAccessTokenUrl(ACCESS_TOKEN_URL)
-
-      // Set the consumer key and secret.
-      .setConsumerKey(CONSUMER_KEY)
-      .setConsumerSecret(CONSUMER_SECRET)
-
-      // Set the name of the callback function in the script referenced
-      // above that should be invoked to complete the OAuth flow.
-      .setCallbackFunction('authCallback')
-
-      // Set the property store where authorized tokens should be persisted.
-      .setPropertyStore(PropertiesService.getUserProperties());
+  
+    // Set the endpoint URLs.
+    .setRequestTokenUrl(REQUEST_TOKEN_URL)
+    .setAuthorizationUrl(AUTHORIZE_URL)
+    .setAccessTokenUrl(ACCESS_TOKEN_URL)
+    
+    // Set the consumer key and secret.
+    .setConsumerKey(CONSUMER_KEY)
+    .setConsumerSecret(CONSUMER_SECRET)
+    
+    // Set the name of the callback function in the script referenced
+    // above that should be invoked to complete the OAuth flow.
+    .setCallbackFunction('authCallback')
+    
+    // Set the property store where authorized tokens should be persisted.
+    .setPropertyStore(PropertiesService.getUserProperties());
 }
 
 /**

@@ -18,11 +18,9 @@
 // =============
 
 var SCRIPT_NAME = "XeroApp"
-var SCRIPT_VERSION = "v1.0"
+var SCRIPT_VERSION = "v2.0 (Dev)"
 
 var PRODUCTION_VERSION = false
-
-var XEROAPP_SHEET_ID = '18nX97UwwoaaEMuvYvtkBX7Qm9v9gKg9iQ6R0v9HWbZQ'
 
 var ACCOUNTS_HIERARCHY_SHEET_NAME = "Accounts Hierarchy"
 var ACCOUNTS_SHEET_NAME = "Accounts Download"
@@ -32,9 +30,9 @@ var RESPONSE_NUMBER = 'FD309906' // 'INV-0065'
 // Log Library
 // -----------
 
-var LOG_LEVEL = PRODUCTION_VERSION ? Log.Level.INFO : Log.Level.FINE
-var LOG_SHEET_ID = XEROAPP_SHEET_ID
-var LOG_DISPLAY_FUNCTION_NAMES = Log.DisplayFunctionNames.NO
+var LOG_LEVEL = PRODUCTION_VERSION ? Log.Level.INFO : Log.Level.ALL
+var LOG_SHEET_ID = ''
+var LOG_DISPLAY_FUNCTION_NAMES = Log.DisplayFunctionNames.YES
 
 // Assert library
 // --------------

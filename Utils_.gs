@@ -262,7 +262,15 @@ getDefault: function(value, defaultValue) {
   Assert.assertDefined(defaultValue, 'Utils_.getDefault()', 'No default value')
   return (value === '' || typeof value === 'undefined') ? defaultValue : value
 
-} // Utils_.getDefault()
+}, // Utils_.getDefault()
+
+isConnected: function() {
+  Log.functionEntryPoint()
+  var value = PropertiesService.getUserProperties().getProperty('isConnected')
+  var isConnected = (value === 'true') ? true : false
+  Log.fine('isConnected: ' + isConnected)
+  return isConnected
+},
 
 } // Utils_
 
