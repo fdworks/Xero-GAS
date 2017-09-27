@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <base target="_top">
+  </head>
+  <body>
+    <form>
+      Here's a button:
+      <button onclick='doSomething(this.parentNode)'>Do something</button>
+    </form>
+  </body>
+</html>
+<script>
+
+function doSomething(formObject) {
+  
+  console.log('doSomething()')
+  
+  google.script.run
+    .withFailureHandler(onFailure)
+    .withSuccessHandler(onSuccess)
+    .doServerSomething(formObject);
+    
+  return  
+  
+  // Private 
+  // -------
+
+  function onSuccess() {
+    console.log('onSuccess()')
+  }    
+
+  function onFailure() {  
+    console.log('onFailure()')  
+  }    
+
+}
+
+</script>

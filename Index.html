@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<!--[if lt IE 7]> <html lang="en" class="lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>    <html lang="en" class="lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>    <html lang="en" class="lt-ie9"> <![endif]-->
+<!--[if IE 9]>    <html lang="en" class="ie9"> <![endif]-->
+<!--[if gt IE 9]><!--> <html lang="en"> <!--<![endif]-->
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
+    <title>Nestable</title>
+    <?!= include('Stylesheet.css')?>    
+</head>
+<body>
+
+    <div id="finished"></div>
+    <div id="error" class="error"></div>
+
+    <h1>Sort the accounts</h1> 
+
+    <p>Sort the list of accounts into suitable categories</p>
+
+    <form>
+
+        <div class="cf nestable-lists">
+            <div class="dd" id="nestable">
+                <ol class="dd-list">
+                    <li class="dd-item" data-id="category1">
+                        <div class="dd-handle">Category 1</div>
+                    </li>
+                    
+<!--  TODO - Bring in sub-categories      
+
+                    <ol class="dd-list">
+                        <li class="dd-item" data-id="cat-1a">
+                            <div class="dd-handle">Sub-category 1a</div>
+                        </li>
+                    </ol>
+-->
+                    <li class="dd-item" data-id="category2">
+                        <div class="dd-handle">Category 2</div>
+                    </li>
+<!--                    
+                    <ol class="dd-list">
+                        <li class="dd-item" data-id="cat-2a">
+                            <div class="dd-handle">Sub-category 2a</div>
+                        </li>
+                    </ol>
+-->
+                </ol>
+            </div>
+            <div class="dd" id="nestable2">
+                <ol class="dd-list">
+                    <?!= itemList ?>
+                </ol>
+            </div>
+        </div>
+
+        <p><strong>Serialised Output (per list)</strong></p>
+        
+        <textarea id="nestable-output" name="nestable-output"></textarea>
+        <textarea id="nestable2-output" name="nestable2-output"></textarea>
+
+        <button onclick='storeHierachy(this.parentNode)'>Save</button>
+        
+    </form>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+
+<?!= include('nestable.js') ?>
+<?!= include('JavaScript.js') ?>
+
+</body>
+</html>
