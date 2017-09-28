@@ -60,7 +60,7 @@ function test_dumpConfig() {
 }
 
 function test_clearConfig() {
-  PropertiesService.getScriptProperties().deleteAllProperties()
+  PropertiesService.getUserProperties().deleteAllProperties()
 }
 
 function test_datesBigger() {
